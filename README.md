@@ -10,3 +10,6 @@ Luego de procesada la base de datos, el archivo db.pickle almacena los datos nec
 
 Para realizar una búsqueda:
 - Ejecutar Nudelns.py, por cuántas búsquedas quiera hacer. El archivo Language_processing.py almacena funciones que procesan texto y son importantes para el buscador. El archivo cos_sim almacena las funciones que implementan el algoritmo 'similitud de cosenos' para realizar la búsqueda.
+
+
+Para uso rápido, descargar Nudelns 2.0.rar, descomprimir y ejecutar nudelns.py
