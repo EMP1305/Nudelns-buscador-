@@ -29,52 +29,62 @@ def imprime_resultados (resultados: list , nombres_archivos: list , lim_p_i = 0 
 
 entrada = input ('Ingrese la búsqueda: ')
 
+continuar = True
+
 while not entrada: # Si no se ingresa nada
     entrada = input ('Debe ingresar una búsqueda para continuar: ')
 
-#Procesar la entrada (tokenizar)
-consulta = tokenización (entrada)
+while continuar:
 
-# Cargar datos de la base de datos
-file = open ('db.pickle','rb')
-data = load (file)
-matriz_tf_idf = data [0] # Importa la matriz tf_idf
-vocabulario = data [1] # Importa el vocabulario
-nom_archivos = data [2] # Importa el nombre de los archivos procesados
+    #Procesar la entrada (tokenizar)
+    consulta = tokenización (entrada)
+    print (consulta)
 
-vector_tf_idf_c = [] # Inicializar vector TF-IDF de la consulta
-doc_total = len (matriz_tf_idf)
+    # Cargar datos de la base de datos
+    file = open ('db.pickle','rb')
+    data = load (file)
+    matriz_tf_idf = data [0] # Importa la matriz tf_idf
+    vocabulario = data [1] # Importa el vocabulario
+    nom_archivos = data [2] # Importa el nombre de los archivos procesados
 
-# Construcción del vector consulta
-for i in range (len(vocabulario)):
-    palabra = vocabulario [i]
-    if palabra in consulta:
-        tf = 1 + log (consulta.count (palabra))
-        doc_frec = 0
-        
-        for fila in matriz_tf_idf:
-            if fila [i]:
-                doc_frec += 1
-        if i == 3:
-            print (doc_total/doc_frec)
-        idf = 1 + log (doc_total / doc_frec)
+    vector_tf_idf_c = [] # Inicializar vector TF-IDF de la consulta
+    doc_total = len (matriz_tf_idf)
 
-        vector_tf_idf_c.append (tf*idf)
+    # Construcción del vector consulta
+    for i in range (len(vocabulario)):
+        palabra = vocabulario [i]
+        if palabra in consulta:
+            tf = 1 + log (consulta.count (palabra))
+            doc_frec = 0
+            
+            for fila in matriz_tf_idf:
+                if fila [i]:
+                    doc_frec += 1
+            if i == 3:
+                print (doc_total/doc_frec)
+            idf = 1 + log (doc_total / doc_frec)
+
+            vector_tf_idf_c.append (tf*idf)
+        else:
+            vector_tf_idf_c.append (0)
+
+    resultados = [] # Inicializar la lista de resultados para la posterior aplicación de similitud de cosenos
+    for vector_tf_idf in matriz_tf_idf:
+        resultados.append (similitud_cos (vector_tf_idf,vector_tf_idf_c))
+
+    print ('\nEl porcentaje de relevancia indica la similitud entre la consulta y el documento referido: \n')
+
+    if max (resultados): # Imprime los resultados en orden decreciente de relevancia, hasta que no haya más resultados relevantes
+        if max (resultados) > 50:
+            print ('Los resultados de alta relevancia son:')
+            imprime_resultados (resultados,nom_archivos,50,inc_i=False)
+        if 0 < max (resultados) <= 50:
+            print ('Los resultados pocos relevantes son:')
+            imprime_resultados (resultados,nom_archivos,lim_p_s=50,inc_i=False)
     else:
-        vector_tf_idf_c.append (0)
+        print ('No hay resultados relevantes')
 
-resultados = [] # Inicializar la lista de resultados para la posterior aplicación de similitud de cosenos
-for vector_tf_idf in matriz_tf_idf:
-    resultados.append (similitud_cos (vector_tf_idf,vector_tf_idf_c))
+    elección = input ('\n¿Desea ingresar otra búsqueda? \n').lower()
 
-print ('\n El porcentaje de relevancia indica la similitud entre la consulta y el documento referido: \n')
-
-if max (resultados): # Imprime los resultados en orden decreciente de relevancia, hasta que no haya más resultados relevantes
-    if max (resultados) > 50:
-        print ('Los resultados de alta relevancia son:')
-        imprime_resultados (resultados,nom_archivos,50,inc_i=False)
-    if 0 < max (resultados) <= 50:
-        print ('Los resultados pocos relevantes son:')
-        imprime_resultados (resultados,nom_archivos,lim_p_s=50,inc_i=False)
-else:
-    print ('No hay resultados relevantes')
+    if elección not in ['sí','si','afirmativo','positivo','efectivamente','yes','indeed','obviously','obviamente']:
+        continuar = False
