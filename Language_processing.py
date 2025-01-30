@@ -47,7 +47,7 @@ def tokenización (s: str) -> list:
         else:
             token += s [i]
             if i == len (s) - 1:
-                lista.append (token)
+                lista.append (token.lower())
 
     return lista
 def stoppers_del (t:list) -> list: # Función opcional en caso de querer usar únicamente el TF-IDF
